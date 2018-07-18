@@ -23,7 +23,7 @@ ui <- fluidPage(
       ),
       sliderInput(inputId = "xrange",
                   label = "X-axis range",
-                  min = 1880, 
+                  min = 1880,
                   max = 2015,
                   value = c(1900, 2015),
                   step = 5,
@@ -51,20 +51,20 @@ server <- function(input, output) {
   
   # Filter the data
   filtered_data <- reactive({
-    plot_names <- input$names %>% 
-      tolower(.) %>% 
-      strsplit(., "[ ,]+") %>% 
+    plot_names <- input$names %>%
+      tolower(.) %>%
+      strsplit(., "[ ,]+") %>%
       unlist(.)
     
-    all_plot_names <- plot_names %>% 
-      strsplit(., "\\+") %>% 
+    all_plot_names <- plot_names %>%
+      strsplit(., "\\+") %>%
       unlist(.) %>%
       str_to_title(.)
-      
+    
     
     data <- babynames %>%
       filter(is.element(name, all_plot_names))%>%
-      filter(n >= input$minbirths) %>% 
+      filter(n >= input$minbirths) %>%
       filter(input$xrange[1] <= year & year <= input$xrange[2])
     
     if (input$sex != "B") {data <- data %>%
@@ -82,7 +82,7 @@ server <- function(input, output) {
     #         data_nys <- data_n %>%
     #           filter(year == this_year) %>%
     #           filter(sex == this_sex)
-    #         
+    #
     #         data <- data.frame(year = this_year,
     #                            sex = this_sex,
     #                            name = paste(this_name_group, collapse = " + "),
