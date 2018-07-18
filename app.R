@@ -47,6 +47,7 @@ ui <- fluidPage(
 
 server <- function(input, output) {
   
+  # Filter the data
   filtered_data <- reactive({
     plot_names <- input$names %>% 
       strsplit(., "\\s") %>% 
@@ -67,37 +68,56 @@ server <- function(input, output) {
       filter(n >= input$minbirths) %>% 
       filter(input$xrange[1] <= year & year <= input$xrange[2])
     
-
-      data <- data %>%
-        mutate(name = paste0(name, " (", sex, ")"))
-
+    
+    # for (i in length(plot_names)) {
+    #   this_name_group <- strsplit(plot_names[i], "\\+") %>%
+    #     unlist(.)
+    #   if (length(this_name_group) > 1) {
+    #     data_n <- data %>%
+    #       filter(is.element(name, this_name_group))
+    #     for (this_year in unique(data_n$year)) {
+    #       for (this_sex in unique(data_n$sex)) {
+    #         data_nys <- data_n %>%
+    #           filter(year == this_year) %>%
+    #           filter(sex == this_sex)
+    #         
+    #         data <- data.frame(year = this_year,
+    #                            sex = this_sex,
+    #                            name = paste(this_name_group, collapse = " + "),
+    #                            n = sum(data_nys$n),
+    #                            prop = sum(data_nys$prop)) %>%
+    #           rbind(., data)
+    #       }
+    #     }
+    #     #data <- data %>% filter(!is.element(name, this_name_group))
+    #   }
+    # }
+    
+    
+    data <- data %>%
+      mutate(name = paste0(name, " (", sex, ")"))
     
     return(data)
   })
   
-  output$show_data <- DT::renderDataTable(filtered_data())
-  
+  # Create plot
   output$main_plot <- renderPlot({
-    
-    data <- filtered_data()
-    
-    
-    
-    
     if (input$yaxis == "prop") {
       yaxis_labels <- scales::percent
     } else if (input$yaxis == "n") {
       yaxis_labels <- waiver()
     }
     
-    ggplot(data = data, mapping = aes_string(x = "year", y = input$yaxis, group = "name")) +
+    ggplot(data = filtered_data(), mapping = aes_string(x = "year", y = input$yaxis, group = "name")) +
       geom_line(aes(colour = name)) +
       scale_x_continuous(limits = input$xrange,
                          breaks = seq(input$xrange[1], input$xrange[2], 10)) +
-      scale_y_continuous(labels = yaxis_labels) +
+      scale_y_continuous(limits = c(0, NA), labels = yaxis_labels) +
       scale_color_brewer(palette = "Set1")
-    
   })
+  
+  # Create dataframe
+  output$show_data <- DT::renderDataTable(filtered_data())
 }
 
 shinyApp(ui = ui, server = server)
