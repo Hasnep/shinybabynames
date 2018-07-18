@@ -4,9 +4,11 @@ library(ggplot2)
 library(magrittr)
 library(dplyr)
 library(scales)
+library(stringr)
 
 ui <- fluidPage(
   titlePanel("Baby Names"),
+  p("Full baby name data provided by the SSA. This includes all names with at least 5 uses."),
   sidebarLayout(
     sidebarPanel(
       textInput(inputId = "names",
@@ -36,7 +38,7 @@ ui <- fluidPage(
       numericInput(inputId = "minbirths",
                    label = "Minimum number of births",
                    value = 5,
-                   min = 5) 
+                   min = 5)
     ),
     mainPanel(
       plotOutput("main_plot"),
@@ -50,24 +52,24 @@ server <- function(input, output) {
   # Filter the data
   filtered_data <- reactive({
     plot_names <- input$names %>% 
-      strsplit(., "\\s") %>% 
+      tolower(.) %>% 
+      strsplit(., "[ ,]+") %>% 
       unlist(.)
     
     all_plot_names <- plot_names %>% 
       strsplit(., "\\+") %>% 
-      unlist(.)
+      unlist(.) %>%
+      str_to_title(.)
+      
     
     data <- babynames %>%
-      filter(is.element(name, all_plot_names))
+      filter(is.element(name, all_plot_names))%>%
+      filter(n >= input$minbirths) %>% 
+      filter(input$xrange[1] <= year & year <= input$xrange[2])
     
     if (input$sex != "B") {data <- data %>%
       filter(sex == input$sex)
     }
-    
-    data <- data %>%
-      filter(n >= input$minbirths) %>% 
-      filter(input$xrange[1] <= year & year <= input$xrange[2])
-    
     
     # for (i in length(plot_names)) {
     #   this_name_group <- strsplit(plot_names[i], "\\+") %>%
@@ -92,7 +94,6 @@ server <- function(input, output) {
     #     #data <- data %>% filter(!is.element(name, this_name_group))
     #   }
     # }
-    
     
     data <- data %>%
       mutate(name = paste0(name, " (", sex, ")"))
