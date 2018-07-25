@@ -6,9 +6,12 @@ library(dplyr)
 library(scales)
 library(stringr)
 
+# TODO: Add the ability to combine names
+# TODO: Add a download image button.
+# TODO: Add an option to have log scale
+
 ui <- fluidPage(
   titlePanel("Baby Names"),
-  p("Full baby name data provided by the SSA. This includes all names with at least 5 uses."),
   sidebarLayout(
     sidebarPanel(
       textInput(inputId = "names",
@@ -38,7 +41,9 @@ ui <- fluidPage(
       numericInput(inputId = "minbirths",
                    label = "Minimum number of births",
                    value = 5,
-                   min = 5)
+                   min = 5),
+      hr(),
+      p("Baby name data for the USA from 1880 to 2015 provided by the SSA. This includes all names with at least 5 uses.")
     ),
     mainPanel(
       plotOutput("main_plot"),
@@ -63,8 +68,9 @@ server <- function(input, output) {
     
     
     data <- babynames %>%
-      filter(is.element(name, all_plot_names))%>%
-      filter(n >= input$minbirths) %>%
+      filter(is.element(name, all_plot_names)) %>%
+      mutate(n = case_when(n >= input$minbirths ~ n)) %>%
+      mutate(prop = case_when(n >= input$minbirths ~ prop)) %>%
       filter(input$xrange[1] <= year & year <= input$xrange[2])
     
     if (input$sex != "B") {data <- data %>%
@@ -118,7 +124,7 @@ server <- function(input, output) {
   })
   
   # Create dataframe
-  output$show_data <- DT::renderDataTable(filtered_data())
+  output$show_data <- DT::renderDataTable(filtered_data() %>% filter(!is.na(n)))
 }
 
 shinyApp(ui = ui, server = server)
