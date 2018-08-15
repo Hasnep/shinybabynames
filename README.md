@@ -5,3 +5,7 @@ Made to teach myself how to use Shiny.
 You can see this project in action at [shinyapps.io](https://hasnep.shinyapps.io/shinybabynames/).
 
 Baby name data for the USA from 1880 to 2015 provided by the SSA. This includes all names with at least 5 uses.
+
+## Code
+
+Code is on [Github](https://github.com/Hasnep/shinybabynames).
