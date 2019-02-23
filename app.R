@@ -63,14 +63,14 @@ server <- function(input, output) {
   # Filter the data
   filtered_data <- reactive({
     plot_names <- input$names %>%
-      tolower(.) %>%
-      strsplit(., "[ ,]+") %>%
-      unlist(.)
+      tolower() %>%
+      strsplit("[ ,]+") %>%
+      unlist()
 
     all_plot_names <- plot_names %>%
-      strsplit(., "\\+") %>%
-      unlist(.) %>%
-      str_to_title(.)
+      strsplit("\\+") %>%
+      unlist() %>%
+      str_to_title()
 
 
     data <- babynames %>%
@@ -129,12 +129,12 @@ server <- function(input, output) {
         breaks = seq(input$xrange[1], input$xrange[2], 10)
       ) +
       scale_y_continuous(limits = c(0, NA), labels = yaxis_labels) +
-      scale_color_brewer(palette = "Set1")+
+      scale_color_brewer(palette = "Set1") +
       theme_minimal()
   })
 
   # Create dataframe
-  output$show_data <- DT::renderDataTable(filtered_data() %>% filter(!is.na(n)))
+  output$show_data <- DT::renderDataTable(drop_na(filtered_data(), "n"))
 }
 
 shinyApp(ui = ui, server = server)
