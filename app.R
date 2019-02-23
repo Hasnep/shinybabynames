@@ -30,8 +30,8 @@ ui <- fluidPage(
         inputId = "xrange",
         label = "X-axis range",
         min = 1880,
-        max = 2015,
-        value = c(1900, 2015),
+        max = 2020,
+        value = c(1920, 2020),
         step = 5,
         sep = ""
       ),
@@ -49,7 +49,7 @@ ui <- fluidPage(
         min = 5
       ),
       hr(),
-      p("Baby name data for the USA from 1880 to 2015 provided by the SSA. This includes all names with at least 5 uses.")
+      p("Baby name data for the USA from 1880 to 2017 provided by the SSA. This includes all names with at least 5 uses.")
     ),
     mainPanel(
       plotOutput("main_plot"),
