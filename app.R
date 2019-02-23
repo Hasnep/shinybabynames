@@ -129,7 +129,8 @@ server <- function(input, output) {
         breaks = seq(input$xrange[1], input$xrange[2], 10)
       ) +
       scale_y_continuous(limits = c(0, NA), labels = yaxis_labels) +
-      scale_color_brewer(palette = "Set1")
+      scale_color_brewer(palette = "Set1")+
+      theme_minimal()
   })
 
   # Create dataframe
