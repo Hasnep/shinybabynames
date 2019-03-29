@@ -5,10 +5,18 @@ library(magrittr)
 library(dplyr)
 library(scales)
 library(stringr)
+library(tidyr)
 
 # TODO: Add the ability to combine names
-# TODO: Add a download image button.
+# TODO: Add a download image button
 # TODO: Add an option to have log scale
+# TODO: Add an age distribution calculator
+# TODO: Make slider have better ticks
+# TODO: Make x-axis ticks better for smaller gaps
+# TODO: Add an explanantion of the names input
+# TODO: Error checking for no names or names not in the dataset
+# TODO: Add a point whenever a line starts/ends
+# TODO: Split into two files
 
 ui <- fluidPage(
   titlePanel("Baby Names"),
@@ -49,7 +57,13 @@ ui <- fluidPage(
         min = 5
       ),
       hr(),
-      p("Baby name data for the USA from 1880 to 2017 provided by the SSA. This includes all names with at least 5 uses.")
+      p(
+        "Baby name data for the USA from 1880 to 2017 provided by the SSA.",
+        "This includes all names with at least 5 uses.",
+        "Source code is available on ",
+        a(href = "https://github.com/Hasnep/shinybabynames", "Github"),
+        "."
+      )
     ),
     mainPanel(
       plotOutput("main_plot"),
@@ -59,7 +73,6 @@ ui <- fluidPage(
 )
 
 server <- function(input, output) {
-
   # Filter the data
   filtered_data <- reactive({
     plot_names <- input$names %>%
