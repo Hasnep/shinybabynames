@@ -17,15 +17,17 @@ library(tidyr)
 # TODO: Error checking for no names or names not in the dataset
 # TODO: Add a point whenever a line starts/ends
 # TODO: Split into two files
+# TODO: Use linetype when > 9 colours are needed
 
 ui <- fluidPage(
   titlePanel("Baby Names"),
   sidebarLayout(
     sidebarPanel(
-      textInput(
+      selectizeInput(
         inputId = "names",
         label = "Names",
-        value = "Mary"
+        choices = NULL,
+        multiple = TRUE
       ),
       radioButtons(
         inputId = "sex",
@@ -72,19 +74,24 @@ ui <- fluidPage(
   )
 )
 
-server <- function(input, output) {
+server <- function(input, output, session) {
+  # Update the select input's choices
+  updateSelectizeInput(
+    session = session,
+    inputId = "names",
+    choices = unique(babynames$name),
+    selected = "Mary",
+    server = TRUE
+  )
+
   # Filter the data
   filtered_data <- reactive({
-    plot_names <- input$names %>%
-      tolower() %>%
-      strsplit("[ ,]+") %>%
-      unlist()
+    plot_names <- tolower(input$names)
 
     all_plot_names <- plot_names %>%
       strsplit("\\+") %>%
       unlist() %>%
       str_to_title()
-
 
     data <- babynames %>%
       filter(is.element(name, all_plot_names)) %>%
